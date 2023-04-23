@@ -19,7 +19,10 @@ exports.signup = async (req, res) => {
         }).catch((err)=>{
             console.log(err);
         })
-      }}).catch((err)=>{
+      }else{
+        res.status(401).send({message: "User already registered"})
+      }
+    }).catch((err)=>{
         console.log(err)
       })
  

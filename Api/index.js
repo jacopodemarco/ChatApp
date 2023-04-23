@@ -17,7 +17,8 @@ app.use(
   cookieSession({
     name: "bezkoder-session",
     secret: "COOKIE_SECRET", // should use as secret environment variable
-    httpOnly: true
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 
   })
 );
 
@@ -40,7 +41,7 @@ db.mongoose
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to chat application." });
+    res.json({ message: req.session});
   });
   
   
