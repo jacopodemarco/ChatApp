@@ -3,6 +3,8 @@ const app = express();
 const port = 8080;
 const cors = require("cors");
 const cookieSession = require("cookie-session");
+const dbConfig = require('./config/db.config');
+const db = require("./models");
 var corsOptions = {
   origin: "http://localhost:8081"
 };
@@ -20,6 +22,21 @@ app.use(
 );
 
 require('./routes/auth.routes')(app);
+
+db.mongoose
+  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("Successfully connect to MongoDB.");
+  })
+  .catch(err => {
+    console.error("Connection error", err);
+    process.exit();
+  });
+
+
 
 // simple route
 app.get("/", (req, res) => {

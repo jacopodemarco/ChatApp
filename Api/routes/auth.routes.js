@@ -1,4 +1,4 @@
-
+const controller = require("../controllers/auth.controller");
 
 module.exports = function (app) {
     app.use(function(req, res, next) {
@@ -10,12 +10,9 @@ module.exports = function (app) {
       });
 
       app.post(
-        "/api/auth/signup",
-       (req, res ) => {
+        "/api/auth/signup",controller.signup);
 
-        console.log(req.body);
-        res.status(200).json({status: "success"})
-       });
+      // app.post('/api/auth/login',)
     
 
 };
