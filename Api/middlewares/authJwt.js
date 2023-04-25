@@ -6,7 +6,7 @@ exports.verifyToken = (req,res,next) => {
     if (!token) {
       return res.status(403).send({ message: "No token provided!" });
     }
-    jwt.verify(token,config.secrets,(err,decoded)=>{
+    jwt.verify(token,config.secret,(err,decoded)=>{
       if (err){
         console.log(err);
         res.status(401).send({message: "Unauthorized!"});

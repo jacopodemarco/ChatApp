@@ -9,10 +9,12 @@ exports.signup = async (req, res) => {
     User.findOne({username: req.body.username}).then(foundUser=>{
         
         if (!foundUser) {  
-        const newUser = new User({
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(req.body.password, salt);
+            const newUser = new User({
             username: req.body.username,
             email: req.body.email,
-            password : req.body.password
+            password : hash
         })
         newUser.save().then(()=>{
             res.status(200).send({message: "User Succesful Registered"})
