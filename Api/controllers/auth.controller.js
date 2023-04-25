@@ -29,22 +29,16 @@ exports.signup = async (req, res) => {
 }
 
 exports.login = (req,res) => {
-   User.findOne({username: req.body.username})
-   .exec((err,user) => {
-  if (err){
-    console.log(err);
-    res.status(500).send({message: err})
-    return
-  }
- 
-  if (!user) {
-    return res.status(404).send({ message: "User Not found." });
-  }
-   
-  var passwordIsValid = bcrypt.compareSync(
-    req.body.password,
-    user.password
-  );
+   User.findOne({username: req.body.username}).then((user) => {
+    console.log(user)
+      if (!user) {
+      return res.status(404).send({ message: "User Not found." });
+      }
+      console.log(user.password);
+      var passwordIsValid = bcrypt.compareSync(
+      req.body.password,
+      user.password
+      );
 
 
   if (!passwordIsValid){
@@ -60,7 +54,15 @@ exports.login = (req,res) => {
 
   res.status(200).send({Status: "Successful Login"})
 
-   })
+   }).catch((err) => {
+      console.log(err);
+      res.status(500).send({message: err})
+      return
+    
+    });
+  
+  
+  
 
 }
 
