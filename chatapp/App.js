@@ -1,8 +1,8 @@
 import React from "react";
 //👇🏻 app screens
-import Login from "./screens/Login";
-import Messaging from "./screens/Messaging";
-import Chat from "./screens/Chat";
+import Login from "./screens/login";
+import Messaging from "./screens/messaging";
+import Chat from "./screens/chat";
 //👇🏻 React Navigation configurations
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
