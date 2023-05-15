@@ -1,18 +1,10 @@
 const express = require('express');
+require('dotenv').config()
 const app = express();
 const port = 8080;
 const cors = require("cors");
 const https = require('https');
-const fs = require("fs");
-var httpsServer = https.createServer(
-  // Provide the private and public key to the server by reading each
-  // file's content with the readFileSync() method.
-  {
-    key: fs.readFileSync("key.pem"),
-    cert: fs.readFileSync("cert.pem"),
-  },
-  app
-)
+var httpsServer = https.createServer(app)
 var ObjectId = require('mongoose').Types.ObjectId; 
 var corsOptions = {
   origin: "*"
@@ -28,7 +20,6 @@ const socketIO = require("socket.io")(httpsServer, {
   }
 });
 const cookieSession = require("cookie-session");
-const dbConfig = require('./config/db.config');
 const db = require("./models");
 const Messages = db.messages;
 const Groups  = db.groups;
@@ -101,7 +92,7 @@ socketIO.on("connection", (socket) => {
 });
 
 db.mongoose
-  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`mongodb+srv://jacopodemarco01:${process.env.PASSWORD}@cluster0.myyquju.mongodb.net/`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -112,6 +103,7 @@ db.mongoose
   })
   .catch(err => {
     console.error("Connection error", err);
+    console.log(process.env.USERNAME,process.env.PASSWORD)
     process.exit();
   });
 
