@@ -75,8 +75,8 @@ const Messaging = ({ route, navigation }) => {
          
         socket.on("newmsg", (messages) => {
             console.log(messages,messages.length)
-            if (messages.length == 1){
-                setChatMessages(chatMessages => [...chatMessages, messages[0]]);
+            if (messages.length >= 1){
+                setChatMessages(chatMessages => [...chatMessages, messages[messages.length-1]]);
             }else{
                 setChatMessages(chatMessages => [...chatMessages, messages]);
             }

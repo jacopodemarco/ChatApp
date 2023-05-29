@@ -7,7 +7,7 @@ var bcrypt = require("bcryptjs");
 
 exports.signup = async (req, res) => {
     User.findOne({username: req.body.username}).then(foundUser=>{
-        
+       if(Object.keys(req.body).length != 0){
         if (!foundUser) {  
             var salt = bcrypt.genSaltSync(10);
             var hash = bcrypt.hashSync(req.body.password, salt);
@@ -24,6 +24,9 @@ exports.signup = async (req, res) => {
       }else{
         res.status(401).send({message: "User already registered"})
       }
+    }else {
+      res.status(401).send({message: "No body provided!"})
+    }
     }).catch((err)=>{
         console.log(err)
       })

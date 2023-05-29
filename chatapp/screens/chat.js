@@ -83,7 +83,7 @@ useEffect(() => {
                 <Modal setVisible={setVisible}></Modal>
             ):
             (
-                <div></div>
+                <Text></Text>
             )}
         </SafeAreaView>
 

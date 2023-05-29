@@ -6,9 +6,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({navigation}) => {
 const [username, setUsername] = useState();
-
+const [password, setPassword] = useState();
 const storeUsername = async () => {
-
+   
     try {
 
         //👇🏻 async function - saves the username to AsyncStorage
@@ -29,13 +29,22 @@ const storeUsername = async () => {
 };
 
 
-const handleSignIn = () => {
+const handleSignIn = async() => {
 
     if (username.trim()) {
-
+        const rawResponse = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: username, password: password})
+          });
+         console.log(JSON.stringify(rawResponse));
         //👇🏻 calls AsyncStorage function
-
+        if (JSON.stringify(rawResponse.status) == 200)
         storeUsername();
+        else{ Alert.alert("User not found!");}
 
     } else {
 
@@ -56,6 +65,16 @@ return(
                         placeholder='Enter your username'
                         style={styles.logininput}
                         onChangeText={(value) => setUsername(value)}
+                    />
+                </View>
+                <View style={styles.logininputContainer}>
+
+                    <TextInput
+                        autoCorrect={false}
+                        placeholder='Enter your password'
+                        style={styles.logininput}
+                        onChangeText={(value) => setPassword(value)}
+                        secureTextEntry={true}
                     />
                 </View>
                 <Pressable onPress={handleSignIn} style={styles.loginbutton}>
