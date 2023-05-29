@@ -10,7 +10,11 @@ module.exports = function (app){
         );
         next();
       });
+        
+        app.get("/rooms", verifyToken, controller.getRooms);
 
+      app.get("/messages", verifyToken, controller.getMessagesByRoom);
+      
       app.get(
         "/messages/all",verifyToken,controller.viewall);
 

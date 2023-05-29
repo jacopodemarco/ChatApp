@@ -112,24 +112,10 @@ db.mongoose
   });
 
 // simple route
-app.get("/", (req, res) => {
+  app.get("/", (req, res) => {
   res.sendFile('public/index.html' , { root : __dirname});
   });
-  
-  app.get("/api", (req, res) => {
 
-    res.json(rooms);
-
-});
-app.get("/messages", async (req, res) => {
-  let query = new ObjectId(req.query.room);
-
-  let messages = await Messages.find({room: query})
-  .then((result) =>{res.json(result);})
-  .catch((err)=>{console.log(err)})
-  
-
-});
   httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
