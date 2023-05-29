@@ -9,8 +9,7 @@ import { styles } from "../utils/styles";
 
 export default function MessageComponent({ item, user }) {
 
-    const status = item.user !== user;
-
+    const status = item.username !== user;
 
     return (
 
@@ -58,13 +57,13 @@ export default function MessageComponent({ item, user }) {
 
                     >
 
-                        <Text>{item.text}</Text>
+                        <Text>{item.payload}</Text>
 
                     </View>
 
                 </View>
 
-                <Text style={{ marginLeft: 40 }}>{item.time}</Text>
+                <Text style={{ marginLeft: 40 }}>{item.createdAt}</Text>
 
             </View>
 

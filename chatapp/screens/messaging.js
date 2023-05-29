@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState,useEffect } from "react";
 
 import { View, TextInput, Text, FlatList, Pressable } from "react-native";
 
@@ -7,36 +7,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MessageComponent from "../components/MessageComponent";
 
 import { styles } from "../utils/styles";
-
+import socket from "../utils/socket";
 
 const Messaging = ({ route, navigation }) => {
 
     const [chatMessages, setChatMessages] = useState([
-
         {
+          _id : 0,
 
-            id: "1",
-
-            text: "Hello guys, welcome!",
-
-            time: "07:50",
-
-            user: "Tomer",
-
-        },
-
-        {
-
-            id: "2",
-
-            text: "Hi Tomer, thank you! 😇",
-
-            time: "08:50",
-
-            user: "David",
-
-        },
-
+          }
     ]);
 
     const [message, setMessage] = useState("");
@@ -46,7 +25,7 @@ const Messaging = ({ route, navigation }) => {
 
     //👇🏻 Access the chatroom's name and id
 
-    const { name, id } = route.params;
+    const { name, _id } = route.params;
 
 
 //👇🏻 This function gets the username saved on AsyncStorage
@@ -60,7 +39,6 @@ const Messaging = ({ route, navigation }) => {
             if (value !== null) {
 
                 setUser(value);
-
             }
 
         } catch (e) {
@@ -75,14 +53,35 @@ const Messaging = ({ route, navigation }) => {
     //👇🏻 Sets the header title to the name chatroom's name
 
     useLayoutEffect(() => {
-
+        function fetchChats() {
+            let base = "http://localhost:3000/messages?room="
+            let address = base.concat(_id); 
+            console.log(address);
+            fetch(address)
+                .then((res) => res.json())
+                .then((data) => {
+                    
+                    setChatMessages(data);
+                
+            } )   .catch((err) => console.error(err));
+        }
+        fetchChats();
         navigation.setOptions({ title: name });
-
         getUsername()
-
+        socket.emit("findRoom", _id);
     }, []);
-
-
+   
+    useEffect(() => {
+         
+        socket.on("newmsg", (messages) => {
+            console.log(messages,messages.length)
+            if (messages.length == 1){
+                setChatMessages(chatMessages => [...chatMessages, messages[0]]);
+            }else{
+                setChatMessages(chatMessages => [...chatMessages, messages]);
+            }
+            });        
+    }, []);
     /*👇🏻 
 
         This function gets the time the user sends a message, then 
@@ -92,7 +91,7 @@ const Messaging = ({ route, navigation }) => {
      */
 
     const handleNewMessage = () => {
-
+        const room_id = _id;
         const hour =
 
             new Date().getHours() < 10
@@ -110,17 +109,17 @@ const Messaging = ({ route, navigation }) => {
 
                 : `${new Date().getMinutes()}`;
 
-
-        console.log({
-
+        const data =  {
+            room_id,
             message,
-
             user,
 
             timestamp: { hour, mins },
 
-        });
+        };
+                socket.emit("newMessage", data);
 
+      setMessage("")
     };
 
 
@@ -152,7 +151,7 @@ const Messaging = ({ route, navigation }) => {
 
                         )}
 
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item._id}
 
                     />
 

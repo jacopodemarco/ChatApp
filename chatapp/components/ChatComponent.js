@@ -14,24 +14,14 @@ const ChatComponent = ({ item }) => {
     const navigation = useNavigation();
 
     const [messages, setMessages] = useState({});
-
-
-    //👇🏻 Retrieves the last message in the array from the item prop
-
-    useLayoutEffect(() => {
-
-        setMessages(item.messages[item.messages.length - 1]);
-
-    }, []);
-
-
+    
     ///👇🏻 Navigates to the Messaging screen
 
     const handleNavigation = () => {
 
         navigation.navigate("Messaging", {
 
-            id: item.id,
+            _id: item._id,
 
             name: item.name,
 
