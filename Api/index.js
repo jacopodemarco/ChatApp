@@ -1,17 +1,17 @@
 const express = require('express');
 require('dotenv').config()
 const app = express();
-const port = 8080;
+const port = 3000;
 const cors = require("cors");
-const https = require('https');
-var httpsServer = https.createServer(app)
+const http = require('http');
+var httpServer = http.createServer(app)
 var ObjectId = require('mongoose').Types.ObjectId; 
 var corsOptions = {
   origin: "*"
 };
 
 app.use(cors(corsOptions));
-const socketIO = require("socket.io")(httpsServer, {
+const socketIO = require("socket.io")(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -46,44 +46,48 @@ socketIO.on("connection", (socket) => {
 	console.log(`⚡: ${socket.id} user just connected!`);
 
 	socket.on("createRoom", (name) => {
-		socket.join(name);
+		//socket.join(name);
     const newGroup = new Groups({
       name: name,
       members: [socket.id],
     })
     newGroup.save().then((newGroup)=>{
-      rooms.unshift({ _id: newGroup._id.toString() , name, messages: [] });
-      console.log(rooms);
+      rooms.push({ _id: newGroup._id , name, members: [socket.id] });
+      console.log(rooms)
+      socket.broadcast.emit("roomsList", rooms);
+      socket.emit("roomsList", rooms);
     }).catch((err)=>{
         console.log(err);
     })
-		socket.emit("roomsList", rooms);
+    
 	});
-
 	socket.on("findRoom", (id) => {
+    socket.join(id)
 		let result = rooms.filter((messages) => messages.room == id);
 		socket.emit("foundRoom", result);
+    console.log(socket.rooms);
 		// console.log("Messages Form", result[0].messages);
 	});
 
-	socket.on("newMessage", (data) => {
+	socket.on("newMessage", async (data) => {
+    console.log(socket.rooms);
 		const { room_id, message, user, timestamp } = data;
-		let result = messages.filter((messages) => messages.room == room_id);
 		const newMessage = new Messages({
 			username: user,
       payload: message,
       room: new ObjectId (room_id),
+      createdAt: new Date(),
     })
     newMessage.save().then(()=>{
   }).catch((err)=>{
       console.log(err);
   })
-		console.log("New Message", newMessage);
-    console.log(result);
-		socket.to(room_id).emit("roomMessage", newMessage);
+    let result = messages.filter((messages) => messages.room == room_id);
 		result.push(newMessage);
-		socket.emit("roomsList", rooms);
-		socket.emit("foundRoom", result);
+    socket.to(room_id).emit("newmsg", result);
+		//socket.emit("roomsList", rooms);
+   // console.log(result);
+		socket.emit("newmsg", newMessage);
 	});
 	socket.on("disconnect", () => {
 		socket.disconnect();
@@ -119,7 +123,6 @@ app.get("/", (req, res) => {
 });
 app.get("/messages", async (req, res) => {
   let query = new ObjectId(req.query.room);
-  console.log(query);
 
   let messages = await Messages.find({room: query})
   .then((result) =>{res.json(result);})
@@ -127,6 +130,6 @@ app.get("/messages", async (req, res) => {
   
 
 });
-  httpsServer.listen(port, () => {
+  httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
